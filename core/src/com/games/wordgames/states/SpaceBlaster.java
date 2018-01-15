@@ -1,3 +1,5 @@
+//Space Blaster, this code is still to be editied 
+
 package com.games.wordgames.states;
 
 import java.awt.Rectangle;
@@ -80,17 +82,6 @@ public class SpaceBlaster extends GameState {
 	
 	private int fuelLeft;
 	private int incorrectAnswers;
-	//private float cannonTip_x;
-	//private float cannonTip_y;
-	
-	//double current_position_x;
-	//double current_position_y;
-	//double direction_x;
-	//double direction_y;
-	//double direction_length;
-	
-	//private Coconut cocoNut;
-	
 	private int lazer_beam_angle;
 	
 	private boolean hit;
@@ -154,15 +145,6 @@ public class SpaceBlaster extends GameState {
 		
 		initSplashScreen();
 		
-		//cannonTip_x = 0;
-		//cannonTip_y = 0;
-		
-		//current_position_x = CANON_BASE_X;
-		//current_position_y = CANON_BASE_Y;
-		
-		//cocoNut = new Coconut(cannonTip_x,cannonTip_y);
-		//testTarget = new Rectangle(Gdx.graphics.getWidth()/6,400,60,130);
-		
 		flyingMeteorArray = new ArrayList<Meteor>();
 		
 		
@@ -207,17 +189,11 @@ public class SpaceBlaster extends GameState {
 		public  void  exit(InputEvent event, float x, float y, int pointer, Actor fromActor){
 			}
 		public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-			//musicToggleTable.clear();
-			//.background(HelpMethods.getTextureRegionDrawable( "images/global/musicIcon/soundOff.png"));
-			//musicToggleTable.add(toggleMusicImgButton).size(50,50);
 			mainMusic.toggleSound();
 			toggleMusicImgButton.getImage().setDrawable(toggleMusicImgButton.getStyle().imageChecked);
 			return false;
 				}
-			
 			});
-		
-		
 		mainMusic.play();
 	}
 	
@@ -231,16 +207,11 @@ public class SpaceBlaster extends GameState {
 		
 		exitButton.addListener(new InputListener(){
 			 public  void  enter(InputEvent event, float x, float y, int pointer, Actor fromActor){
-				// showExitButtonToolTip();
 					}
 				public  void  exit(InputEvent event, float x, float y, int pointer, Actor fromActor){
-					//hideExitButtonToolTip();
 					}
 				public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 					System.out.println("EXIT");
-					//confirmExit();
-					//showExitConfirm = true;
-					//
 					disableFire = true;
 					isExitConfirmation = true;
 					setExitConfirm();
@@ -260,7 +231,6 @@ public class SpaceBlaster extends GameState {
 		isExitConfirmation = true;
 		stage.clear();
 		stage.addActor(exitConfirmation.getTable());
-		
 	}
 	
 	
@@ -297,6 +267,7 @@ public class SpaceBlaster extends GameState {
 	}
 
 	private void generateTargetArray(){
+		//Dead method 
 		targets = new ArrayList<Meteor>();
 		for(int i = 0;i<750;i+=150){
 			//targets.add(new Meteor(i+50,400,sbQuestion.getRandomWord()));
@@ -307,8 +278,6 @@ public class SpaceBlaster extends GameState {
 
 	private void initTextures(){
 		spaceBackground =  Assets.manager.get("images/Space Blaster/starBackground.jpg",Texture.class);
-		
-		//bambooBlaster = new Texture(Gdx.files.internal("assets/images/Bamboo blaster/bambooGun.png"));
 		crossHair =  Assets.manager.get("images/Space Blaster/crossHair.png",Texture.class);
 		lazerBeam =  Assets.manager.get("images/Space Blaster/lazerBeamGreen.png",Texture.class);
 		meteorImage =  Assets.manager.get("images/Space Blaster/meteor.png",Texture.class);
@@ -316,7 +285,6 @@ public class SpaceBlaster extends GameState {
 		lazerGunLeft  =Assets.manager.get("images/Space Blaster/leftGun.png",Texture.class);
 		lazerGunRight  =Assets.manager.get("images/Space Blaster/rightGun.png",Texture.class);
 		spaceShip = Assets.manager.get("images/Space Blaster/ship.png",Texture.class);
-		//brokenLeaf = new Texture(Gdx.files.internal("assets/images/Bamboo blaster/brokenLeaf.png"));
 		fuelTankTextures = new Texture[6];
 		for(int i = 0; i<6;i++){
 			fuelTankTextures[i] = Assets.manager.get("images/Space Blaster/fuelTank/"+i+".png",Texture.class);
@@ -331,27 +299,10 @@ public class SpaceBlaster extends GameState {
 				if(!disableFire){
 					lazer.fireLazer();
 					shotsFired +=1;
-					
-					if(!lazer.inBounds()){  
-						
-						//calculateLazerBeamAngle();
-						//lazer = new Lazer(400,50);
-						
-						//sbQuestion.nextQuestion();
-					}
-						
-					
-					
-					
 					if(hit){
 						hit = false;
 					}
 				}
-				
-				//if(!cocoNut.inBounds())
-				//	cocoNut = new Coconut(cannonTip_x,cannonTip_y);
-				//leafTarget= new Texture(Gdx.files.internal("assets/images/Bamboo blaster/leaf.png"));
-				
 			}
 			}
 			
@@ -376,8 +327,6 @@ public class SpaceBlaster extends GameState {
 			if(!gameStart){
 				gameStart = true;
 				splashScreen.startGame();
-				
-				
 			}
 		}
 		
@@ -411,11 +360,7 @@ public class SpaceBlaster extends GameState {
 		
 		checkDisableFireSoundToggle();
 		updateClock();
-		//updateCocoPos();
-		//cocoNut.updatePos();
-		//checkHits();
 		lazer.updatePos();
-		//checkHits();
 		checkInBounds();
 		
 		checkGameOver();
@@ -568,56 +513,13 @@ public class SpaceBlaster extends GameState {
 			spawnMeteor();
 		}
 		
-		/*
-
-		if(flyingMeteor.getRect().contains(lazer.getXpos(), lazer.getYpos())){
-			metExp.setPos(flyingMeteor.getX(), flyingMeteor.getY());
-			explosionAnimation.setPos(flyingMeteor.getX(), flyingMeteor.getY());
-			explosionAnimation.start();
-			metExp.explode();
-			flyingMeteor.resetRect();
-		}
-		*/
 	}
 
 	public void checkHits(){
 		
-		/*
-		 * for(Meteor m: targets){
-			Rectangle r = new Rectangle(m.getX(),m.getY(),m.getWidth(),m.getHeight());
-			if(!m.isHit()){
-				if(r.contains(lazer.getXpos(),lazer.getYpos())){
-					//explosionSound.play();
-					metExp.setPos(m.getX(), m.getY());
-					explosionAnimation.setPos(m.getX(), m.getY());
-					explosionAnimation.start();
-					metExp.explode();
-					//targets.remove(m);
-					m.hit();
-					checkAnswer(m.getWord());
-				}
-			}
-			
-		}
-		 */
-		
 		removeTarget();
 		Rectangle r = new Rectangle(met.getX(),met.getY(),100,100);
-		/*
-		 * if(r.contains(lazer.getXpos(),lazer.getYpos())){
-			
-			
-			//explosionSound.play();
-			metExp.setPos(met.getX(), met.getY());
-			explosionAnimation.setPos(met.getX(), met.getY());
-			explosionAnimation.start();
-			metExp.explode();
-			met = new Meteor();
-			meteorWord = sbQuestion.getRandomWord();
-			
-			
-		}
-		 */
+		
 	}
 	
 	private void removeTarget(){
@@ -646,10 +548,6 @@ public class SpaceBlaster extends GameState {
 		//Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		sb.begin();
 		sb.draw(spaceBackground,-10,-5,855,610);
-		
-		//sb.draw(coconut, (float)cocoNut.getXpos(),(float)cocoNut.getYpos(),20,20);
-		
-		//System.out.println("WID "+Gdx.graphics.getWidth());
 		
 		sb.end();
 		stage.draw();
@@ -692,32 +590,10 @@ public class SpaceBlaster extends GameState {
 				sb.end();
 			}
 			
-			//drawDebug();
-			
-			 
-			
-			/*
-			 * if(advanceFrame){
-				metExp.nextFrame();
-				advanceFrame = false;
-			}
-			if(!metExp.compleate()){
-				sb.begin();
-				//sb.draw(lazerGunLeft,LEFT_CANON_BASE_X,LEFT_CANON_BASE_Y,230,150);
-				//sb.draw(metExp.getTexture(),metExp.getX(),metExp.getY(),100,100);
-
-				sb.end();
-			}
-			 */
-			
 		}else{
 			drawSplashScreen();
 		}
 		
-		
-		
-		
-		//System.out.println(Gdx.input.getY());
 	}
 	
 	private void drawFlyingMeteor(){
@@ -731,13 +607,6 @@ public class SpaceBlaster extends GameState {
 			sb.end();
 			
 		}
-		sb.begin();
-		//sb.draw(meteorImage,flyingMeteor.getX(),flyingMeteor.getY(),100,100);
-		//fontMedium.setColor(1, 1, 1, 1);
-	
-		//fontMedium.draw(sb,flyingMeteor.getWord(), flyingMeteor.getX(),flyingMeteor.getY()+120);
-		
-		sb.end();
 		
 	}
 
@@ -924,15 +793,7 @@ public class SpaceBlaster extends GameState {
 		FontManager.fontMedium.setColor(1,1,1,1);
 		FontManager.fontMedium.draw(sb, "DIRX: "+mp2.x+" DIRY: "+mp2.y,300,400);
 		sb.end();
-		/*
-		 * shapeRenderer.begin(ShapeType.Line);
-		shapeRenderer.setAutoShapeType(true);
-		shapeRenderer.circle(CANON_BASE_X-5,  CANON_BASE_Y, 10);
-		shapeRenderer.circle(cannonTip_x,cannonTip_y, 10);
-		shapeRenderer.rect(CANON_BASE_X, CANON_BASE_Y, 30, 120);
-		shapeRenderer.rect(testTarget.x,testTarget.y,testTarget.width,testTarget.height);
-		shapeRenderer.end();
-		 */
+		
 	}
 	@Override
 
