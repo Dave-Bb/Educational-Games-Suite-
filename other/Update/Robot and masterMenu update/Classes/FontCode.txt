@@ -1,0 +1,14 @@
+generator = new FreeTypeFontGenerator(Gdx.files.internal("assets/fonts/AGENTORANGE.ttf"));
+		parameter = new FreeTypeFontParameter();
+		parameter.size = 60;
+		comicFont = generator.generateFont(parameter); // font size 12 pixels
+		comicFont.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		comicFont.setColor(0, 0, 0, 0.8f);
+		
+		generator = new FreeTypeFontGenerator(Gdx.files.internal("assets/fonts/JungleFever.ttf"));
+		parameter = new FreeTypeFontParameter();
+		parameter.size = 32;
+		jungleFont = generator.generateFont(parameter); // font size 12 pixels
+		jungleFont.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		jungleFont.setColor(0, 0, 0, 0.8f);
+		

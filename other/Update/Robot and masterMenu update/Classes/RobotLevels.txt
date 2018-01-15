@@ -1,0 +1,184 @@
+package com.games.wordgames.gameobjects;
+
+import com.badlogic.gdx.utils.Array;
+import com.games.wordgames.handlers.RobotLogicGroundBloc;
+
+public class RobotLevels {
+	//private RobotLogicGroundBloc[][] mapArray;
+	private Array<RobotLogicGroundBloc[][]> levelArray;
+	private RobotLogicGroundBloc[][] mapArray ;
+	private int level;
+	public RobotLevels(){
+		levelArray = new Array<RobotLogicGroundBloc[][]>();
+		mapArray = new RobotLogicGroundBloc[5][6];
+		initLevels();
+		level = 0;
+	}
+	
+	private void initLevels(){
+		initLevelOne();
+		initLevelTwo();
+		initLevelThree();
+		initLevelFour();
+		initLevelFive();
+		initLevelSix();
+	}
+	
+	private void initLevelOne(){
+		mapArray = generateMap();
+		mapArray[4][0].setDraw(true);
+		mapArray[4][1].setDraw(true);
+		mapArray[4][2].setDraw(true);
+		mapArray[4][3].setDraw(true);
+		mapArray[4][4].setDraw(true);
+		mapArray[4][4].setFinish();
+		mapArray[4][2].addCoin();
+		levelArray.add(mapArray);
+		
+	}
+	
+	private void initLevelTwo(){
+		mapArray = generateMap();
+		mapArray[1][0].setDraw(true);
+		mapArray[1][1].setDraw(true);
+		mapArray[1][2].setDraw(true);
+		mapArray[1][3].setDraw(true);
+		mapArray[2][3].setDraw(true);
+		mapArray[3][3].setDraw(true);
+		mapArray[4][0].setDraw(true);
+		mapArray[4][1].setDraw(true);
+		mapArray[4][2].setDraw(true);
+		mapArray[4][3].setDraw(true);
+		mapArray[1][0].setFinish();
+		mapArray[2][3].addCoin();
+		levelArray.add(mapArray);
+	}
+	
+	private void initLevelThree(){
+		mapArray = generateMap();
+		mapArray[1][1].setDraw(true);
+		mapArray[1][2].setDraw(true);
+		mapArray[1][3].setDraw(true);
+		mapArray[2][1].setDraw(true);
+		mapArray[2][3].setDraw(true);
+		mapArray[3][1].setDraw(true);
+		mapArray[3][3].setDraw(true);
+		mapArray[4][0].setDraw(true);
+		mapArray[4][1].setDraw(true);
+		mapArray[4][3].setDraw(true);
+		mapArray[4][4].setDraw(true);
+		mapArray[4][5].setDraw(true);
+		mapArray[4][5].setFinish();
+		mapArray[2][1].addCoin();
+		mapArray[2][3].addCoin();
+		levelArray.add(mapArray);
+		
+	}
+	
+	private void initLevelFour(){
+		mapArray = generateMap();
+		mapArray[0][0].setDraw(true);
+		mapArray[0][1].setDraw(true);
+		mapArray[0][2].setDraw(true);
+		mapArray[1][0].setDraw(true);
+		mapArray[1][2].setDraw(true);
+		mapArray[1][3].setDraw(true);
+		mapArray[2][0].setDraw(true);
+		mapArray[2][3].setDraw(true);
+		mapArray[2][4].setDraw(true);
+		mapArray[3][0].setDraw(true);
+		mapArray[3][4].setDraw(true);
+		mapArray[4][0].setDraw(true);
+		mapArray[4][4].setDraw(true);
+		mapArray[4][5].setDraw(true);
+		mapArray[4][5].setFinish();
+		mapArray[3][0].addCoin();
+		mapArray[2][0].addCoin();
+		mapArray[1][0].addCoin();
+		levelArray.add(mapArray);
+	}
+	
+	private void initLevelFive(){
+		mapArray = generateMap();
+		mapArray[1][2].setDraw(true);
+		mapArray[1][3].setDraw(true);
+		mapArray[1][4].setDraw(true);
+		mapArray[2][2].setDraw(true);
+		mapArray[2][4].setDraw(true);
+		mapArray[3][2].setDraw(true);
+		mapArray[3][4].setDraw(true);
+		mapArray[4][0].setDraw(true);
+		mapArray[4][1].setDraw(true);
+		mapArray[4][2].setDraw(true);
+		mapArray[4][3].setDraw(true);
+		mapArray[4][4].setDraw(true);
+		mapArray[4][5].setDraw(true);
+		mapArray[4][5].setFinish();
+		mapArray[1][2].addCoin();
+		mapArray[1][4].addCoin();
+		mapArray[4][3].makeHole();
+		levelArray.add(mapArray);
+	}
+	
+	private void initLevelSix(){
+		mapArray = generateMap();
+		mapArray[0][0].setDraw(true);
+		mapArray[0][1].setDraw(true);
+		mapArray[0][2].setDraw(true);
+		mapArray[0][3].setDraw(true);
+		mapArray[0][4].setDraw(true);
+		mapArray[0][5].setDraw(true);
+		mapArray[1][0].setDraw(true);
+		mapArray[1][5].setDraw(true);
+		mapArray[2][0].setDraw(true);
+		mapArray[2][2].setDraw(true);
+		mapArray[2][3].setDraw(true);
+		mapArray[2][4].setDraw(true);
+		mapArray[2][5].setDraw(true);
+		mapArray[3][0].setDraw(true);
+		mapArray[3][5].setDraw(true);
+		mapArray[4][0].setDraw(true);
+		mapArray[4][1].setDraw(true);
+		mapArray[4][2].setDraw(true);
+		mapArray[4][3].setDraw(true);
+		mapArray[4][4].setDraw(true);
+		mapArray[4][5].setDraw(true);
+		mapArray[2][2].setFinish();
+		mapArray[0][5].addCoin();
+		mapArray[2][5].addCoin();
+		mapArray[1][5].makeHole();
+		levelArray.add(mapArray);
+	}
+	
+	private RobotLogicGroundBloc[][] generateMap(){
+		RobotLogicGroundBloc[][] blankMap = new RobotLogicGroundBloc[5][6];
+		for(int row =0;row<5;row++){
+			for(int col  = 0;col<6;col++){
+				blankMap[row][col] = 
+						new RobotLogicGroundBloc(250+(64*col),480-(row*64));
+				//sb.draw(groundTexture,200+(64*i),380-(j*64),64,72);
+			}
+			
+		}
+		
+		return blankMap;
+		
+	}
+	
+	public void nextLevel(){
+		if(level<levelArray.size-1){
+			level +=1;
+		}else{
+			level = 0;
+		}
+	}
+	
+	public RobotLogicGroundBloc[][] getMap(){
+		return levelArray.get(level);
+	}
+	
+	public RobotLogicGroundBloc[][] getMap(int i){
+		return levelArray.get(i);
+	}
+	
+}

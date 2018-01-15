@@ -1,0 +1,265 @@
+package com.games.wordgames.states;
+
+import java.awt.Rectangle;
+import java.util.ArrayList;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Cursor.SystemCursor;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.games.wordgames.gameobjects.BambooBlasterQuestion;
+import com.games.wordgames.gameobjects.BambooBlasterTarget;
+import com.games.wordgames.gameobjects.Coconut;
+import com.games.wordgames.handlers.GameStateManager;
+import com.games.wordgames.handlers.MyInput;
+
+public class BambooBlaster extends GameState {
+	
+	private Texture jungleBackground;
+	private Texture bambooBlaster;
+	private Texture crossHair;
+	private Texture coconut;
+	private Texture leafTarget;
+	private Texture brokenLeaf;
+	
+	public static final float CANON_BASE_X = Gdx.graphics.getWidth()/2;
+	public static final float CANON_BASE_Y = Gdx.graphics.getHeight()/6.5f;
+	
+	private float cannonTip_x;
+	private float cannonTip_y;
+	
+	//double current_position_x;
+	//double current_position_y;
+	//double direction_x;
+	//double direction_y;
+	//double direction_length;
+	private Coconut cocoNut;
+	
+	private int canon_angle;
+	
+	private boolean hit;
+	
+	private Rectangle testTarget;
+	
+	private ArrayList<BambooBlasterTarget> targets;
+	
+	private BambooBlasterQuestion question;
+
+	public BambooBlaster(GameStateManager gsm) {
+		super(gsm);
+		
+		initTextures();
+		hit= false;
+		canon_angle = 0;
+		cannonTip_x = 0;
+		cannonTip_y = 0;
+		
+		question = new BambooBlasterQuestion();
+		
+		//current_position_x = CANON_BASE_X;
+		//current_position_y = CANON_BASE_Y;
+		
+		cocoNut = new Coconut(cannonTip_x,cannonTip_y);
+		
+		generateTargetArray();
+		
+		testTarget = new Rectangle(Gdx.graphics.getWidth()/6,400,60,130);
+	}
+	
+	private void generateTargetArray(){
+		targets = new ArrayList<BambooBlasterTarget>();
+		for(int i = 0;i<600;i+=100){
+			targets.add(new BambooBlasterTarget(i+Gdx.graphics.getWidth()/6,400,60,130));
+			
+		}
+		
+	}
+	
+	private void initTextures(){
+		jungleBackground = new Texture(Gdx.files.internal("assets/images/Bamboo blaster/jungleBackground.png"));
+		bambooBlaster = new Texture(Gdx.files.internal("assets/images/Bamboo blaster/bambooGun.png"));
+		crossHair = new Texture(Gdx.files.internal("assets/images/Bamboo blaster/crossHair.png"));
+		coconut = new Texture(Gdx.files.internal("assets/images/Bamboo blaster/coconut.png"));
+		leafTarget= new Texture(Gdx.files.internal("assets/images/Bamboo blaster/leaf.png"));
+		brokenLeaf = new Texture(Gdx.files.internal("assets/images/Bamboo blaster/brokenLeaf.png"));
+	}
+	
+	
+
+	@Override
+	public void handleInput() {
+		if(Gdx.input.justTouched()){
+			if(hit){
+				hit = false;
+			}
+			if(!cocoNut.inBounds())
+				cocoNut = new Coconut(cannonTip_x,cannonTip_y);
+			//leafTarget= new Texture(Gdx.files.internal("assets/images/Bamboo blaster/leaf.png"));
+			
+		}
+		
+		if(MyInput.isPressed(MyInput.ESCAPE)){
+			
+				stage.clear();
+				gsm.setState(GameStateManager.MASTER_MENU);
+		}
+		if(Gdx.input.isKeyJustPressed(Keys.SPACE)){
+				question.setNew();
+			}
+		
+	}
+
+	@Override
+	public void update(float delta) {
+		
+		handleInput();
+		
+		//updateCocoPos();
+		cocoNut.updatePos();
+		checkHits();
+		
+		
+	}
+	
+	public void checkHits(){
+		for(BambooBlasterTarget t:targets){
+			t.checkHit(cocoNut.getXpos(), cocoNut.getYpos());
+		}
+	}
+	
+	
+	
+	private void drawBlaster(){
+		
+		calculateCannonAngle();
+		
+		
+		sb.begin();
+		sb.draw(bambooBlaster,CANON_BASE_X-22,CANON_BASE_Y,
+				16, 0, 30,120, 1, 1, canon_angle, 0, 0, 80, 300, false, false);
+		sb.end();
+	}
+	
+	
+	
+	
+	private void calculateCannonAngle(){
+		
+		double origonX = CANON_BASE_X-32;
+		double origonY =((Gdx.graphics.getHeight())- CANON_BASE_Y);
+		double opposite = origonY-Gdx.input.getY()+120;
+		double adjasent = 0;
+		boolean neg = true;
+		if(Gdx.input.getX()>origonX){
+			adjasent = Gdx.input.getX()- origonX-32;
+			neg = false;
+		}else{
+			adjasent = origonX - Gdx.input.getX();
+			
+		}
+		double hyp = Math.sqrt((adjasent*adjasent)+(opposite*opposite));
+		
+		canon_angle = (int) (Math.asin(adjasent/hyp)*100);
+		
+		if(!neg){
+			canon_angle*=-1;
+		}
+		
+		if(canon_angle<-45){
+			canon_angle=-45;
+		}
+		if(canon_angle>45){
+			canon_angle = 45;
+		}
+		
+		cannonTip_x = (float) (CANON_BASE_X-((Math.sin(Math.toRadians(canon_angle)))*120))-20;
+		cannonTip_y = CANON_BASE_Y+(float) ((Math.cos(Math.toRadians(canon_angle)))*120)-20;
+		
+	}
+	
+	
+	
+	public void drawCross(){
+		sb.begin();
+		sb.draw(crossHair,Gdx.input.getX()-16,Gdx.graphics.getHeight()-Gdx.input.getY()-16,34,34);
+		sb.end();
+	}
+
+	@Override
+	public void render() {
+		Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		sb.begin();
+		sb.draw(jungleBackground,-10,-5,855,610);
+		
+		//sb.draw(coconut, (float)cocoNut.getXpos(),(float)cocoNut.getYpos(),20,20);
+		
+		
+		
+		sb.end();
+		
+		//drawDebug();
+		if(!hit){
+			drawCoconut();
+		}
+		
+		
+		
+		drawTargets();
+		drawQuestion();
+		drawBlaster();
+		drawCross();
+	}
+	
+	public void drawQuestion(){
+		sb.begin();
+		jungleFont.setColor(0, 0, 0, 0.7f);
+		jungleFont.draw(sb,question.getQuestion(), 150,300);
+		sb.end();
+		
+	}
+	public void drawCoconut(){
+		sb.begin();
+		sb.draw(coconut, (float)cocoNut.getXpos(),(float)cocoNut.getYpos(),20,20);
+		sb.end();
+	}
+	public void drawTargets(){
+		sb.begin();
+		
+		for(BambooBlasterTarget t:targets){
+			if(!t.isHit()){
+				sb.draw(leafTarget, t.getX(),t.getY(),t.getWidth(),t.getHeight());
+				//hit = false;
+			}
+			else{
+				sb.draw(brokenLeaf, t.getX(),t.getY(),t.getWidth(),t.getHeight());
+				
+			}
+		}
+		
+		for(int i = 0;i<600;i+=100){
+			jungleFont.draw(sb, ""+question.getNumber(i/100), i+150,400);
+		}
+		sb.end();
+		
+	}
+	
+	private void drawDebug(){
+
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.setAutoShapeType(true);
+		shapeRenderer.circle(CANON_BASE_X-5,  CANON_BASE_Y, 10);
+		shapeRenderer.circle(cannonTip_x,cannonTip_y, 10);
+		shapeRenderer.rect(CANON_BASE_X, CANON_BASE_Y, 30, 120);
+		shapeRenderer.rect(testTarget.x,testTarget.y,testTarget.width,testTarget.height);
+		shapeRenderer.end();
+	}
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

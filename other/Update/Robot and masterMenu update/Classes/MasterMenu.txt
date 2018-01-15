@@ -1,0 +1,356 @@
+package com.games.wordgames.states;
+
+import java.util.ArrayList;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.games.wordgames.handlers.GameStateManager;
+
+public class MasterMenu extends GameState {
+	
+	private Table mainButtonTable;
+	private Table titleTable;
+	private Table navigationTable;
+	
+	private TextButton backButton;
+	
+	private ArrayList<TextButton> buttons;
+	
+	private String menuTitle;
+	private String menuTitle2;
+	
+	private Label menuTitleLable;
+	
+	private TextButton button;
+	
+	private TextButton wordGamesButton;
+	private TextButton numberGamesButton;
+	private TextButton baloonTyperButton;
+	private TextButton spaceBlasterButton;
+	private TextButton hangManButton;
+	private TextButton wordSumsButton;
+	private TextButton speedSumsButton;
+	private TextButton bambooBlasterButton;
+	private TextButton robotRulesButton;
+	
+	private static final String[] MAIN_MENU_ITEMS = {"Word Games","Number Games"};
+	private static final String[] WORD_GAMES_MENU_ITEMS = {"Falling Baloons","Space Blaster","Hang Man"};
+	private static final String[] NUMBER_GAMES_MENU_ITEMS = {"Word Sums","Speed Sums","Bamboo Blaster","Money Master"};
+	
+	private static final int MAIN_MENU_STATE = 0;
+	private static final int WORD_GAME_STATE =1;
+	private static final int NUMBER_GAME_STATE = 2;
+	
+	private int menuState;
+	
+	private TextButton yesButton;
+	private TextButton noButton;
+	private Table confirmLogOutTable;
+	
+	private Texture mainMenuBackgroundTx;
+	
+	
+	private boolean exitConfirm;
+	
+	public MasterMenu(GameStateManager gsm) {
+		super(gsm);
+		
+		initBackButton();
+		
+		mainMenuBackgroundTx= new Texture(Gdx.files.internal("assets/images/mainMenu/menuBakcground1.png"));
+		
+		exitConfirm = false;
+		
+		
+		menuTitleLable = new Label(menuTitle,levelPane);
+		mainButtonTable = new Table().debug();
+		
+		titleTable = new Table();
+		titleTable.setPosition(300, 400);
+		//stage.addActor(titleTable);
+		
+		//titleTable.add(menuTitleLable);
+		menuTitleLable.setFontScale(2);
+		
+		stage.addActor(mainButtonTable);
+		//
+		
+		//titleTable.add(menuTitleLable);
+		
+		
+		buttons = new ArrayList<TextButton>();
+		initTextButtons();
+		setToMainMenu();
+	}
+	/*
+	 * wordGamesButton;
+		numberGamesButton;
+	    baloonTyperButton;
+		spaceBlasterButton;
+		hangManButton;
+		wordSumsButton;
+		speedSumsButton;
+		bambooBlasterButton;
+	 */
+	
+	private void initTextButtons(){
+		wordGamesButton = new TextButton("Word Games",comicSkin);
+		numberGamesButton = new TextButton("Number Games",comicSkin);
+	    baloonTyperButton =new  TextButton("Balloon Typer",comicSkin);
+		spaceBlasterButton=new  TextButton("Space Blaster",comicSkin);
+		hangManButton= new TextButton("Hang Man",comicSkin);
+		wordSumsButton= new TextButton("Word Sums",comicSkin);
+		speedSumsButton= new TextButton("Speed Sums",comicSkin);
+		bambooBlasterButton= new TextButton("Bamboo Blaster",comicSkin);
+		yesButton = new TextButton("Yes",comicSkin);
+		noButton = new TextButton("No",comicSkin);
+		robotRulesButton = new TextButton("Robot Rules",comicSkin);
+		
+		yesButton.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				logOut();
+				return false;
+			}
+		});
+		
+		noButton.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				setToMainMenu();
+				exitConfirm = false;
+				return false;
+			}
+		});
+		
+		wordGamesButton.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				setWordGamesMenu();
+				return false;
+			}
+		});
+		
+		numberGamesButton.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				setNumberGamesMenu();
+				return false;
+			}
+		});
+		
+		robotRulesButton.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				startRobotRules();
+				return false;
+			}
+		});
+		
+		baloonTyperButton.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				startFallingLettersGame();
+				return false;
+			}
+		});
+		spaceBlasterButton.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				
+				return false;
+			}
+		});
+		hangManButton.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				startHangManGame();
+				return false;
+			}
+		});
+		
+		wordSumsButton.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				startWordSumsGame();
+				return false;
+			}
+		});
+		speedSumsButton.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				startSpeedSumsGame();
+				return false;
+			}
+		});
+		bambooBlasterButton.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				startBambooBlaster();
+				return false;
+			}
+		});
+		
+	}
+	
+	private void initBackButton(){
+		backButton = new TextButton("Back",comicSkin);
+		navigationTable = new Table();
+		navigationTable.setPosition(100, 550);
+		stage.addActor(navigationTable);
+		navigationTable.add(backButton);
+		backButton.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				//menuState = MAIN_MENU_STATE;
+				switch(menuState){
+				case MAIN_MENU_STATE:
+					confirmExit();
+					break;
+				case NUMBER_GAME_STATE:
+					setToMainMenu();
+					break;
+				case WORD_GAME_STATE:
+					setToMainMenu();
+				}
+				return false;
+			}
+		});
+		
+	}
+	
+	private void logOut(){
+		stage.clear();
+		gsm.setState(GameStateManager.LOG_IN);
+	}
+	
+	@Override
+	public void handleInput() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update(float delta) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private void setToMainMenu(){
+		menuTitle = "Main";
+		menuTitle2 = "Menu";
+		menuState = MAIN_MENU_STATE;
+		mainButtonTable.clear();
+		mainButtonTable.setPosition(400, 300);
+		mainButtonTable.add(wordGamesButton).pad(25);
+		mainButtonTable.row();
+		mainButtonTable.add(numberGamesButton).pad(25);
+		mainButtonTable.row();
+		
+		backButton.setText("Log Out");
+		
+		
+	}
+	
+	private void confirmExit(){
+		exitConfirm = true;
+		mainButtonTable.clear();
+		mainButtonTable.add(yesButton).pad(30);
+		mainButtonTable.add(noButton).pad(30);
+	}
+	
+	private void setNumberGamesMenu(){
+		menuState = NUMBER_GAME_STATE;
+		menuTitle = "Number";
+		menuTitle2 = "Games";
+		mainButtonTable.clear();
+		mainButtonTable.setPosition(400, 300);
+		mainButtonTable.add(wordSumsButton).pad(10);
+		mainButtonTable.row();
+		mainButtonTable.add(speedSumsButton).pad(10);
+		mainButtonTable.row();
+		mainButtonTable.add(bambooBlasterButton).pad(10);
+		mainButtonTable.row();
+		mainButtonTable.add(robotRulesButton).pad(10);
+		mainButtonTable.row();
+		backButton.setText("Back");
+		
+		
+	}
+	
+	private void setWordGamesMenu(){
+		
+		menuState = WORD_GAME_STATE;
+		menuTitle = "Word";
+		menuTitle2 = "Games";
+		mainButtonTable.clear();
+		mainButtonTable.setPosition(400, 300);
+		mainButtonTable.add(baloonTyperButton).pad(25);
+		mainButtonTable.row();
+		mainButtonTable.add(spaceBlasterButton).pad(25);
+		mainButtonTable.row();
+		mainButtonTable.add(hangManButton).pad(25);
+		mainButtonTable.row();
+		backButton.setText("Back");
+		
+	}
+
+	@Override
+	public void render() {
+		Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		sb.begin();
+		sb.draw(mainMenuBackgroundTx, -40, 0, 850, 600);
+		if(menuState==NUMBER_GAME_STATE){
+			comicFont.draw(sb, menuTitle,250, 600);
+		}else{
+			comicFont.draw(sb, menuTitle,280, 600);
+		}
+		
+		comicFont.draw(sb, menuTitle2,280, 520);
+		if(exitConfirm){
+			fontMedium.draw(sb, "Are you sure you want to log out?",200, 450);
+		}
+		
+		sb.end();
+		stage.act(Gdx.graphics.getDeltaTime());
+		stage.draw();
+		
+	}
+	
+	private void startRobotRules(){
+		stage.clear();
+		gsm.setState(GameStateManager.ROBOT_LOGIC);
+	}
+	private void startHangManGame(){
+		stage.clear();
+		gsm.setState(GameStateManager.HANG_MAN);
+	}
+	
+	private void startFallingLettersGame(){
+		stage.clear();
+		gsm.setState(GameStateManager.FALLING_LETTERS);
+	}
+	private void backMainMenu(){
+		stage.clear();
+		gsm.setState(GameStateManager.MAIN_MENU);
+	}
+	
+	private void startBambooBlaster(){
+		stage.clear();
+		gsm.setState(GameStateManager.BAMBOO_BLASTER);
+	}
+	
+	private void startWordSumsGame(){
+		stage.clear();
+		gsm.setState(GameStateManager.WORD_SUMS);
+		
+	}
+	
+	private void startSpeedSumsGame(){
+		stage.clear();
+		gsm.setState(GameStateManager.SPEED_SUMS);
+		
+	}
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

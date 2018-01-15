@@ -1,0 +1,601 @@
+package com.games.wordgames.states;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector;
+import com.badlogic.gdx.math.Vector2;
+import com.games.wordgames.gameobjects.Robot;
+import com.games.wordgames.gameobjects.RobotLevels;
+import com.games.wordgames.handlers.GameStateManager;
+import com.games.wordgames.handlers.RobotLogicGroundBloc;
+
+public class RobotLogic extends GameState {
+	
+	private Texture blueBackgroundTx;
+	private Texture groundTexture;
+	private Texture groundHoleTexture;
+	private Texture finishLineTexture;
+	
+	private RobotLogicGroundBloc[][] mapArray;
+	
+	private Texture coinTexture;
+	
+	private RobotLevels levels;
+	
+	private Texture[] arrowTx;
+	private Texture rightArrow;
+	private Texture leftArrow;
+	private Texture upArrow;
+	private Texture downArrow;
+	private Texture arrowSelecor;
+	
+	private Texture playTexture;
+	private Texture resetTexture;
+	private Texture clearTexture;
+	private Texture nextLevelArrowTexture;
+	private Rectangle nextLevelRect;
+	private Rectangle[] controlPanelRectangles;
+	
+	private Rectangle[] arrowSelectorRectangles;
+	private int[] selectorPosition;
+	private int currentSelectorPos;
+	
+	private Texture robotDownTx;
+	private Texture robotUpTx;
+	private Texture robotLeftTx;
+	private Texture robotRightTx;
+	
+	private Robot robot;
+	
+	private boolean levelEditor;
+	private boolean freeMovement;
+	private boolean debug;
+	
+	private int[][] instructionSet= {{Robot.RIGHT,185,0},{Robot.UP,0,295},{Robot.LEFT,-185,0}};
+	
+	private int setIndex;
+	
+	private int level;
+	
+	public RobotLogic(GameStateManager gsm) {
+		super(gsm);
+		blueBackgroundTx =new Texture(Gdx.files.internal("assets/images/RobotLogic/BlueBackgorund.png"));
+		groundTexture =new Texture(Gdx.files.internal("assets/images/RobotLogic/path.png"));
+		groundHoleTexture =new Texture(Gdx.files.internal("assets/images/RobotLogic/pathHole.png"));
+		finishLineTexture = new Texture(Gdx.files.internal("assets/images/RobotLogic/finishLine.png"));
+		coinTexture=new Texture(Gdx.files.internal("assets/images/RobotLogic/coin.png"));
+		
+		initRobotTexture();
+		
+		initControlPanel();
+		mapArray = new RobotLogicGroundBloc[5][6];
+		
+		generateBlankMap();
+		
+		robot = new Robot(250,250);
+		
+		level = 0;
+		
+		levels = new RobotLevels();
+		
+		levelEditor = false;
+		
+		freeMovement = true;
+		
+		debug = false;
+		
+	}
+	
+	private void initControlPanel(){
+		initArrowTextures();
+		playTexture=new Texture(Gdx.files.internal("assets/images/RobotLogic/run.png"));
+		resetTexture=new Texture(Gdx.files.internal("assets/images/RobotLogic/resetArrow.png"));
+		clearTexture=new Texture(Gdx.files.internal("assets/images/RobotLogic/clearMap.png"));
+		controlPanelRectangles = new Rectangle[3];
+		controlPanelRectangles[0] = new Rectangle(300,140,50,50);
+		controlPanelRectangles[1] = new Rectangle(400,140,50,50);
+		controlPanelRectangles[2] = new Rectangle(480,140,70,50);
+		
+		nextLevelArrowTexture=new Texture(Gdx.files.internal("assets/images/RobotLogic/nextLevelArrow.png"));
+		nextLevelRect = new Rectangle(350,70,155,75);
+	}
+	
+	private void initArrowTextures(){
+		
+		selectorPosition = new int[4];
+		arrowTx = new Texture[4];
+		rightArrow=new Texture(Gdx.files.internal("assets/images/RobotLogic/arrows/rightArrow.png"));
+		leftArrow=new Texture(Gdx.files.internal("assets/images/RobotLogic/arrows/leftArrow.png"));
+		upArrow=new Texture(Gdx.files.internal("assets/images/RobotLogic/arrows/upArrow.png"));
+		downArrow=new Texture(Gdx.files.internal("assets/images/RobotLogic/arrows/downArrow.png"));
+		arrowSelecor =new Texture(Gdx.files.internal("assets/images/RobotLogic/arrows/directionSelector.png"));
+		arrowTx[0] = downArrow;
+		arrowTx[1] = upArrow;
+		arrowTx[2]= leftArrow;
+		arrowTx[3] = rightArrow;
+		
+		arrowSelectorRectangles = new Rectangle[4];
+		
+		for(int i=0;i<4;i++){
+			selectorPosition[i] =250+(i*100);
+			arrowSelectorRectangles[i] = new Rectangle(250+(i*100),50,64,64);
+	
+		}
+		currentSelectorPos = 0;
+	}
+	
+	private void initRobotTexture(){
+		robotDownTx=new Texture(Gdx.files.internal("assets/images/RobotLogic/robot/robotDown.png"));
+		robotUpTx=new Texture(Gdx.files.internal("assets/images/RobotLogic/robot/robotUp.png"));
+		 robotLeftTx=new Texture(Gdx.files.internal("assets/images/RobotLogic/robot/robotLeft.png"));
+		 robotRightTx=new Texture(Gdx.files.internal("assets/images/RobotLogic/robot/robotRight.png"));
+	}
+	
+	private void generateBlankMap(){
+		for(int row =0;row<5;row++){
+			for(int col  = 0;col<6;col++){
+				mapArray[row][col] = 
+						new RobotLogicGroundBloc(250+(64*col),480-(row*64));
+				//sb.draw(groundTexture,200+(64*i),380-(j*64),64,72);
+			}
+			
+		}
+		
+	}
+	
+
+	@Override
+	public void handleInput() {
+		
+		if(Gdx.input.justTouched()){
+			getCurrentSelection();
+			checkBoxClicked();
+			checkControlPanel();
+			if(robot.levelCompleate()){
+				if(nextLevelRect.contains(Gdx.input.getX(),Gdx.graphics.getHeight()-Gdx.input.getY())){
+					levels.nextLevel();
+					robot.reset();
+				}
+			}
+			if(levelEditor){
+				blockOnOff();
+			}
+		}
+		if(freeMovement){
+			if(Gdx.input.isKeyJustPressed(Keys.LEFT)){
+				robot.changeDirection(Robot.LEFT);
+			}
+			if(Gdx.input.isKeyJustPressed(Keys.RIGHT)){
+				robot.changeDirection(Robot.RIGHT);
+			}
+			if(Gdx.input.isKeyJustPressed(Keys.UP)){
+				robot.changeDirection(Robot.UP);
+			}
+			if(Gdx.input.isKeyJustPressed(Keys.DOWN)){
+				robot.changeDirection(Robot.DOWN);
+			}
+			if(Gdx.input.isKeyPressed(Keys.LEFT)){
+				robot.moveLeft();
+				
+				
+			}if(Gdx.input.isKeyPressed(Keys.RIGHT)){
+				
+				robot.moveRight();
+				
+			}if(Gdx.input.isKeyPressed(Keys.UP)){
+				robot.moveUp();
+			}if(Gdx.input.isKeyPressed(Keys.DOWN)){
+				robot.moveDown();
+			}
+		}
+		
+		if(Gdx.input.isKeyJustPressed(Keys.SPACE)){
+			System.out.println("RUN");
+			robot.run();
+		}
+		if(Gdx.input.isKeyJustPressed(Keys.R)){
+			reset();
+		}
+		if(Gdx.input.isKeyJustPressed(Keys.S)){
+			if(levelEditor){
+				saveLevelDesign();
+			}else{
+				robot.stopRun();
+			}
+			
+		}
+		if(Gdx.input.isKeyJustPressed(Keys.N)){
+			if(!levelEditor){
+				levels.nextLevel();
+				mapArray = levels.getMap();
+			}
+		}
+		
+		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)){
+			gsm.setState(GameStateManager.MASTER_MENU);
+		}
+		
+		
+	}
+	
+	private void checkControlPanel(){
+		if(controlPanelRectangles[0].contains(Gdx.input.getX(), Gdx.graphics.getHeight()-Gdx.input.getY())){
+			robot.run();
+		}if(controlPanelRectangles[1].contains(Gdx.input.getX(),  Gdx.graphics.getHeight()-Gdx.input.getY())){
+			robot.reset();
+			System.out.println("RESET");
+		}if(controlPanelRectangles[2].contains(Gdx.input.getX(),  Gdx.graphics.getHeight()-Gdx.input.getY())){
+			clearAllArrows();
+		}
+	}
+	
+	private void reset(){
+		robot.reset();
+	}
+	
+	private void clearAllArrows(){
+		for(int row =0;row<5;row++){
+			for(int col  = 0;col<6;col++){
+				mapArray[row][col].removeArrow();
+			}
+		}
+	}
+	
+	private void checkOffMap(){
+		boolean offMap = true;
+		//System.out.println("OFF MAP");
+		for(int row =0;row<5;row++){
+			for(int col  = 0;col<6;col++){
+				if(mapArray[row][col].isDraw()){
+					if(mapArray[row][col].boxClicked(robot.getxPos(), robot.getyPos())){
+						offMap = false;
+					}
+				}
+			}
+		}
+		
+		if(offMap){
+			System.out.println("OFF MAP");
+			robot.reset();
+		}
+	}
+	
+	private void nextLevel(){
+		level +=1;
+	}
+	private void saveLevelDesign(){
+		System.out.println("mapArray = generateMap();");
+		for(int row =0;row<5;row++){
+			for(int col  = 0;col<6;col++){
+				if(mapArray[row][col].isDraw()){
+					System.out.println("mapArray["+row+"]["+col+"].setDraw(true);");
+				}
+			}
+		}
+		System.out.println("levelArray.add(mapArray);");
+	}
+	
+	private void checkBoxClicked(){
+		for(int row =0;row<5;row++){
+			for(int col  = 0;col<6;col++){
+				if(mapArray[row][col].boxClicked(Gdx.input.getX(), 600-Gdx.input.getY())){
+					System.out.print(row+":"+col+",");
+					if(mapArray[row][col].isDraw()){
+						if(mapArray[row][col].hasArrow()){
+							mapArray[row][col].removeArrow();
+							
+							
+						}else{
+							mapArray[row][col].setArrow(currentSelectorPos);
+						}
+					}
+				}
+				
+			}
+			
+		}
+	}
+	
+	private void blockOnOff(){
+		
+		for(int row =0;row<5;row++){
+			for(int col  = 0;col<6;col++){
+				if(mapArray[row][col].boxClicked(Gdx.input.getX(), 
+						600-Gdx.input.getY())){
+					if(mapArray[row][col].isDraw()){
+						mapArray[row][col].setDraw(false);
+					}else{
+						mapArray[row][col].setDraw(true);
+					}
+				}
+			}
+		}
+		
+	}
+	
+	private void getCurrentSelection(){
+		
+		for(int i = 0; i<4;i++){
+			if(arrowSelectorRectangles[i].contains(Gdx.input.getX(),Gdx.graphics.getHeight()- Gdx.input.getY())){
+				currentSelectorPos = i;
+				System.out.println("CONTAINS");
+			}
+		}
+		
+	}
+
+	@Override
+	public void update(float delta) {
+		handleInput();
+		robot.update();
+		checkGround();
+		checkOffMap();
+		//robot.printPos();
+		
+	}
+	
+	private void checkGround(){
+		for(int row =0;row<5;row++){
+			for(int col  = 0;col<6;col++){
+				if(mapArray[row][col].isDraw()){
+					if(mapArray[row][col].hasHole()){
+						if(checkPathObject(row,col)){
+							robot.reset();
+						}
+					}
+					if(mapArray[row][col].hasCoin()){
+						if(checkPathObject(row,col)){
+							robot.addCoin();
+							mapArray[row][col].pickUpCoin();
+							
+						}
+					}
+					if(mapArray[row][col].isFinish()){
+						if(checkPathObject(row,col)){
+							robot.setLevelFinished();
+						}
+					}
+					
+					if(mapArray[row][col].hasArrow()){
+						if(checkPathObject(row,col)){
+							robot.changeDirection(mapArray[row][col].getCurrentArrow());
+						}
+					}
+					
+				}
+			}
+		}
+		
+	}
+	
+	private boolean checkPathObject(int row, int col){	
+		for(int i = 0; i<4;i++){
+			if(robot.getDirection()==i){
+				if(mapArray[row][col].boxClicked(robot.getxPos()+(int)robot.getOffSet(i).x, 
+						robot.getyPos()+(int)robot.getOffSet(i).y)){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void render() {
+		Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);		
+		drawBackground();
+		//setDemoLevel2();
+		//drawLevelPath();
+		if(!levelEditor){
+			drawFullLevelPath();
+		}
+		if(levelEditor){
+			drawLevelEditorPath();
+		}
+		
+		drawRobot();
+		drawScore();
+		if(!robot.levelCompleate()){
+			drawControlPanel();
+		}
+		
+		
+		if(robot.levelCompleate()){
+			drawLevelCompleate();
+		}
+		if(debug){
+			robotDebug();
+			mapDebug();
+		}
+		
+		
+	}
+	
+	private void drawScore(){
+		sb.begin();
+		fontMedium.draw(sb,"COINS: "+robot.getCoinCount(),350,40);
+		
+		sb.end();
+	}
+	
+	private void drawLevelCompleate(){
+		sb.begin();
+		fontLarge.draw(sb,"LEVEL COMPLEATE",180,200);
+		sb.draw(nextLevelArrowTexture,350,70,155,75);
+		sb.end();
+	}
+	
+	private void drawControlPanel(){
+		drawArrowSelectorPanel();
+		drawButtonPanel();
+	}
+	
+	private void drawButtonPanel(){
+		sb.begin();
+		sb.draw(playTexture,300,140,50,50);
+		sb.draw(resetTexture,400,140,50,50);
+		sb.draw(clearTexture,480,140,70,50);
+		sb.end();
+	}
+	
+	private void drawLevelEditorPath(){
+		sb.begin();
+		for(int row =0;row<5;row++){
+			for(int col = 0;col<6;col++){
+				int x = mapArray[row][col].getxPos();
+				int y = mapArray[row][col].getyPos();
+				if(mapArray[row][col].isDraw()){
+					sb.draw(groundTexture,x,y,64,72);
+					if(mapArray[row][col].hasArrow()){
+						sb.draw(arrowTx[mapArray[row][col].getCurrentArrow()],
+								mapArray[row][col].getxPos(),mapArray[row][col].getyPos(),
+								64,64);
+					}
+				}
+				
+			}
+			
+		}
+		
+		sb.end();
+		
+	}
+	private void drawArrowSelectorPanel(){
+		sb.begin();
+		
+		for(int i=0;i<4;i++){
+			sb.draw(arrowTx[i],250+(i*100),50,64,64);
+		}
+		sb.draw(arrowSelecor,selectorPosition[currentSelectorPos],50,64,64);
+		sb.end();
+		
+	}
+	
+	private void drawRobot(){
+		int direction = robot.getDirection();
+		sb.begin();
+		switch(direction){
+		case Robot.UP:
+			sb.draw(robotUpTx,robot.getxPos(),robot.getyPos(),159/3,246/3);
+			break;
+		case Robot.DOWN:
+			sb.draw(robotDownTx,robot.getxPos(),robot.getyPos(),159/3,246/3);
+			break;
+		case Robot.LEFT:
+			sb.draw(robotLeftTx,robot.getxPos()+10,robot.getyPos(),80/3,246/3);
+			break;
+		case Robot.RIGHT:
+			sb.draw(robotRightTx,robot.getxPos()+10,robot.getyPos(),80/3,246/3);
+			break;
+		}
+		
+		sb.end();
+	}
+	
+	private void setDemoLevel(){
+		for(int i = 0;i<4;i++){
+			mapArray[4][i].setDraw(true);
+			mapArray[1][i].setDraw(true);
+		}
+		for(int i = 4;i>1;i--){
+			mapArray[i][3].setDraw(true);
+		}
+	}
+	
+	private void setDemoLevel2(){
+		mapArray[1][1].setDraw(true);
+		mapArray[2][1].setDraw(true);
+		mapArray[2][2].setDraw(true);
+		mapArray[3][2].setDraw(true);
+		mapArray[4][0].setDraw(true);
+		mapArray[4][1].setDraw(true);
+		mapArray[4][2].setDraw(true);
+		mapArray[4][3].setDraw(true);
+		mapArray[4][4].setDraw(true);
+
+	}
+	
+	private void drawFullLevelPath(){
+		mapArray = levels.getMap();
+		sb.begin();
+		for(int row =0;row<5;row++){
+			for(int col = 0;col<6;col++){
+				int x = mapArray[row][col].getxPos();
+				int y = mapArray[row][col].getyPos();
+				if(mapArray[row][col].isDraw()){
+					sb.draw(groundTexture,x,y,64,72);
+					if(mapArray[row][col].hasHole()){
+						sb.draw(groundHoleTexture,x,y,64,72);
+					}
+					if(mapArray[row][col].isFinish()){
+						sb.draw(finishLineTexture,mapArray[row][col].getxPos()+10,
+								mapArray[row][col].getyPos()+15,
+								45,45);
+					}
+					if(mapArray[row][col].hasArrow()){
+						if(!mapArray[row][col].hasHole()){
+							sb.draw(arrowTx[mapArray[row][col].getCurrentArrow()],
+									mapArray[row][col].getxPos(),mapArray[row][col].getyPos(),
+									64,64);
+						}
+						
+					}
+					if(mapArray[row][col].hasCoin()){
+						sb.draw(coinTexture,x+20,y+30,25,36);
+					}
+				}
+				
+			}
+			
+		}
+		
+		sb.end();
+	}
+	
+	private void robotDebug(){
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.setColor(0, 0, 0, 1);
+		shapeRenderer.setAutoShapeType(true);
+		shapeRenderer.rect(robot.getxPos(), robot.getyPos(), robot.getWidth(), robot.getHeight());
+		
+		shapeRenderer.end();
+	}
+	
+	private void mapDebug(){
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.setColor(1, 1, 1, 1);
+		shapeRenderer.setAutoShapeType(true);
+		for(int row =0;row<5;row++){
+			for(int col = 0;col<6;col++){
+				int x = mapArray[row][col].getxPos();
+				int y = mapArray[row][col].getyPos();
+				if(mapArray[row][col].isDraw()){
+					shapeRenderer.rect(x,y,64,72);
+					if(mapArray[row][col].hasArrow()){
+						shapeRenderer.rect(mapArray[row][col].getxPos(),mapArray[row][col].getyPos(),
+								64,64);
+					}
+				}
+				
+			}
+		}
+		shapeRenderer.end();
+	}
+	
+	private void drawBackground(){
+		sb.begin();
+		sb.draw(blueBackgroundTx,0,0,850,650);
+		sb.end();
+	}
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}
