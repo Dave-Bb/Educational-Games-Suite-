@@ -17,24 +17,29 @@ This program uses the LibGdxlibrary, more information can be found here > https:
 ############################### 
 
 -------------Speed Sums-----------------
+
 The aim of this game is to solve the simple maths problems before the time runs out 
 Select your difficulty level at the start of each game 
 
 
 -------------Bamboo Blaster-------------
+
 Use a bamboo cannon to shoot coconuts at the leaves hanging from the trees 
 Each level the user is asked a question, and needs to shoot the correct coconuts down 
 
 
 -------------Robot Rules----------------
+
 A simple logic game. Place the arrows on the maze and help guide the robot to the finish line, while collecting coins along the way. The arrows need to be set before the robot starts its run! 
 
 
 -------------Space Blaster--------------
+
 Use your lazer cannon to destroy the meteors with the correct parts of speech
 
 
 -------------Balloon Typer--------------
+
 Type the letters on the balloons as they float away, don’t miss more than 3! Each level will have more balloons! 
 
 
