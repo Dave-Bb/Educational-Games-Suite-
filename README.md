@@ -1,4 +1,4 @@
-# Word-Games
+# Mini Java Games for kids 
 
 Java mini games made using LibGdx game library 
 
@@ -13,7 +13,7 @@ This program uses the LibGdxlibrary, more information can be found here > https:
 #All game assets, backgrounds were created using LibreOffice Draw. These various .draw files can be found word-games/other/images folders 
 # This project is still in development, please feel free to use any of this code as you see fit! Any suggestions are welcome! 
 
-       Game Descriptions 
+Game Descriptions 
 ############################### 
 
 -------------Speed Sums-----------------
